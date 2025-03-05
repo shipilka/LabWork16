@@ -1,10 +1,9 @@
-﻿// Task1/User.cs
+﻿// Task3/User.cs
 using System;
-using System.ComponentModel;
 
-namespace Task1
+namespace Task3
 {
-    public class User : INotifyPropertyChanged
+    public class User
     {
         private string login;
         private string password;
@@ -14,10 +13,16 @@ namespace Task1
             get => login;
             set
             {
+                string error = string.IsNullOrEmpty(value) ? "Логин не может быть пустым." : string.Empty;
                 if (login != value)
                 {
                     login = value;
-                    OnPropertyChanged(nameof(Login));
+                    OnDataChanged?.Invoke(this, new InfoEventArgs
+                    {
+                        PropertyName = nameof(Login),
+                        ErrorText = error,
+                        ChangeDate = DateTime.Now
+                    });
                 }
             }
         }
@@ -27,19 +32,20 @@ namespace Task1
             get => password;
             set
             {
+                string error = value != null && (value.Length < 6 || value.Length > 20) ? "Пароль должен содержать от 6 до 20 символов." : string.Empty;
                 if (password != value)
                 {
                     password = value;
-                    OnPropertyChanged(nameof(Password));
+                    OnDataChanged?.Invoke(this, new InfoEventArgs 
+                    {
+                        PropertyName = nameof(Password),
+                        ErrorText = error,
+                        ChangeDate = DateTime.Now
+                    });
                 }
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        public event EventHandler<InfoEventArgs> OnDataChanged; 
     }
 }
